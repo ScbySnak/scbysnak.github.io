@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="77-bit Lands Arena spec by Sasha Gulak: ranked PvP loop, formulas, leaderboard rules, battle flow, and implementation handoff.">
+    <title>77-bit Lands Arena Spec | Sasha Gulak</title>
+    <link rel="stylesheet" href="../assets/css/styles.css?v=lands-case-study-9">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav wrap" aria-label="Contact links">
+        <a class="brand" href="../index.html" aria-label="Sasha Gulak portfolio home">
+          <span>Sasha Gulak</span>
+          <span class="brand-separator">·</span>
+          <span class="brand-role">Game Designer</span>
+        </a>
+        <div class="top-links">
+          <a class="contact-link contact-email" href="mailto:frozerbox@gmail.com">frozerbox@gmail.com</a>
+          <a class="contact-link contact-telegram" href="https://t.me/scbysnak">@scbysnak</a>
+          <a class="contact-link contact-cv" href="../assets/docs/Sasha_Gulak_Game_Designer_CV.pdf">Resume</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="wrap-page">
+        <a class="back-link" href="../case-studies/77-bit-lands.html">← 77-bit Lands</a>
+
+        <section class="doc-section-hero">
+          <h1>77-bit Lands Arena Spec</h1>
+          <p class="doc-definition">Ranked PvP systems spec · 77-bit Lands · Sasha Gulak · 2024-2026</p>
+
+          <div class="doc-body hero-summary">
+            <p>This page contains the public Arena handoff for 77-bit Lands: ranked PvP loop, Prime-to-Power progression, Gold flow, leaderboard rules, battle sequence, and UI states.</p>
+            <ul>
+              <li><a href="../case-studies/77-bit-lands.html">Back to the Lands case study</a></li>
+              <li><a href="https://77bit-lands-arena-prototype.vercel.app/#/prototypes/arena-v1" target="_blank" rel="noopener noreferrer">Open the Arena prototype</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="doc-section">
+          <h2>Full Document</h2>
+          <p class="doc-definition">Public rendering of the Arena systems spec for easier reading and navigation.</p>
+
+          <div class="doc-content doc-document-page">
+            <article class="embedded-doc" aria-label="Arena systems specification">
+<h1>Arena</h1>
+<h2>Overview</h2>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/arena-overview.png"></p>
+<p>A season-scoped competitive mode where players battle for Gold, climb a leaderboard, and earn end-of-season token rewards.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Play Lands to generate Resources.</li>
+<li>Spend Resources to upgrade Prime Level.</li>
+<li>Enter Arena and spend Battle Energy to attack eligible opponents.</li>
+<li>Win or lose Gold through Battles and see leaderboard rank change.</li>
+<li>Gain passive Gold Income from your current League over time.</li>
+<li>Upgrade Prime Level to increase Power for more combat strength.</li>
+<li>Reach season end and see final standings locked from the final leaderboard snapshot.</li>
+<li>Claim earned tokens manually after season end if you hold Season Pass.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Arena is open to all players.</li>
+<li>Season Pass is required for Arena gameplay perks and token reward eligibility at season end.</li>
+<li>Arena uses Gold as its only score currency.</li>
+<li>Arena Battles transfer Gold only and must not transfer Resources.</li>
+<li>Prime Level is provided by Prime forging.</li>
+<li>Season duration is 5 days.</li>
+<li>Season start and end time is shared for all players.</li>
+<li>Final standings are computed from a single snapshot taken at season end.</li>
+<li>Players must claim tokens manually after season end.</li>
+</ul>
+<h2>Prime</h2>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/prime.png"></p>
+<p>A progression system that converts Resources into Prime Level and derived Power for Arena combat strength.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Open Prime and view your current Prime Level.</li>
+<li>Spend Resources to upgrade Prime Level.</li>
+<li>See your derived Power update after the upgrade.</li>
+<li>Open Arena and use the increased Power in Battles.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Prime Level is the primary progression shown in Arena and on the Leaderboard.</li>
+<li>Battle uses a derived Power value computed from Prime Level.</li>
+<li>Power is displayed as a derived value and is not upgraded directly in Arena.</li>
+<li>Arena access requires a minimum Prime Level of <code>default: 5; tunable</code>.</li>
+<li>If the player is below the minimum Prime Level, Arena is locked and the UI shows the required level.</li>
+</ul>
+<h3>Prime power</h3>
+<p>When calculating Prime power, the following features of Prime upgrades are taken into account:</p>
+<ol>
+<li>Energy spent on obtaining resources for level N;</li>
+<li>Time spent on obtaining Prime level N;</li>
+<li>Probability of upgrading Prime to level N;</li>
+</ol>
+<pre><code class="language-csharp">var energy_spent; //how much energy is spent on gathering resources
+var energy_spent_coef; //rounding coefficient
+var time_spent; //how much time was spent upgrading the Prime
+var time_spent_coef; //rounding coefficient
+var attempts; //average number of attempts needed to increase the Prime by "N" level
+var prime_power_coef; //rounding coefficient
+var factor; //The number to whose multiples value will be rounded, depends of prime level
+
+var prime_power = (energy_spent * energy_spent_coef) * (time_spent * time_spent_coef) * attempts * prime_power_coef;
+return ceiling (prime_power, factor);
+</code></pre>
+<h2>Gold</h2>
+<p>Gold is a season-scoped score currency that determines leaderboard rank and end-of-season token reward amount.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>View your current Gold total and rank.</li>
+<li>Gain Gold passively from Gold Income over time.</li>
+<li>Win or lose Gold from Battle outcomes.</li>
+<li>Track rank changes as your Gold changes.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Gold is displayed as an integer value.</li>
+<li>Gold must not drop below <code>0</code>.</li>
+<li>Gold is not transferable outside Arena.</li>
+<li>Gold is gained from Gold Income.</li>
+<li>Gold is transferred by Battle outcomes.</li>
+<li>A player may have <code>0 Gold</code>.</li>
+<li>A player with <code>0 Gold</code> remains on the Leaderboard.</li>
+<li>A player with <code>0 Gold</code> continues to receive Gold Income.</li>
+</ul>
+<h3>Passive Gold Income</h3>
+<p>An Arena-only Gold source that grants periodic Gold based on the player's League for passive rank progression.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Open Arena and see your current League and Gold Income rate.</li>
+<li>Wait for Gold to accrue automatically over time.</li>
+<li>Receive credited Gold at the scheduled cadence.</li>
+<li>See your Gold Income rate change when your League changes.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Gold Income is based on leaderboard position at the moment crediting is computed.</li>
+<li>Gold Income is credited at a regular cadence of <code>default: every 2 hours; tunable</code>.</li>
+<li>The UI shows the player's League number and Gold Income rate.</li>
+<li>Gold Income must not scale with Season Pass.</li>
+<li>Leagues are computed from the percentage of active players at credit time.</li>
+<li>
+<p>League thresholds and Gold Income values use the following defaults:</p>
+<table>
+<thead>
+<tr>
+<th>League</th>
+<th>Active players</th>
+<th>Income</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Top 1%</td><td>+40 Gold / 2h</td></tr>
+<tr><td>2</td><td>Top 3%</td><td>+25 Gold / 2h</td></tr>
+<tr><td>3</td><td>Top 8%</td><td>+16 Gold / 2h</td></tr>
+<tr><td>4</td><td>Top 18%</td><td>+10 Gold / 2h</td></tr>
+<tr><td>5</td><td>Top 35%</td><td>+6 Gold / 2h</td></tr>
+<tr><td>6</td><td>Top 55%</td><td>+4 Gold / 2h</td></tr>
+<tr><td>7</td><td>Top 78%</td><td>+3 Gold / 2h</td></tr>
+<tr><td>8</td><td>Remaining players</td><td>+2 Gold / 2h</td></tr>
+</tbody>
+</table>
+</li>
+</ul>
+<h2>Arena screen</h2>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/arena-screen.png"></p>
+<p>A battle screen that lets players spend Battle Energy to attack nearby ranks for Gold transfer and leaderboard movement.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Open the Arena screen after reaching the minimum Prime Level.</li>
+<li>See the Leaderboard, player stats panel, Battle Energy, and league promotion goal.</li>
+<li>Browse opponents and start Battles.</li>
+<li>Track Gold, rank, and League changes between Battles.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>The Arena screen requires the minimum Prime Level to access.</li>
+<li>On first entry, the Arena screen shows the onboarding sequence before the standard view.</li>
+</ul>
+<h3>Leaderboard</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/leaderboard.png"></p>
+<p>A ranked listing that orders Arena players by Gold for target discovery, Gold Income assignment, and season placement.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Open the Leaderboard and see your rank, Gold, and a player-centered action window around your current position.</li>
+<li>Press <code>Refresh</code> to load a new leaderboard refresh snapshot.</li>
+<li>Browse nearby ranks and review opponents' Prime Level and win chance.</li>
+<li>Click Attack on an eligible opponent within attack range to open the Attack Setup window.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Leaderboard entries are sorted by Gold in descending order.</li>
+<li>Leaderboard position determines Gold Income.</li>
+<li>Each entry shows rank, player identifier, Gold, Prime Level, and win chance.</li>
+<li>Win chance is computed as <code>attackerPower / (attackerPower + defenderPower)</code>.</li>
+<li>Windowed scrolling: the Leaderboard shows a slice of entries centered on the player's rank. Scrolling up or down loads more entries on demand.</li>
+<li>League promotion goal: a strip above the Leaderboard showing the next League, its Income rate, and ranks remaining. Not shown when the player is in League 1.</li>
+<li>Attack range: the rank distance from the player's current rank that determines which opponents are targetable. Default is <code>default: +/-5 ranks; tunable</code>.</li>
+<li>Attack Range Expansion: a time-limited monetization buff. While active, increases attack range by an additional <code>default: +/-5 ranks; tunable</code>. Affects only the buyer.</li>
+<li>Attack validation: on Attack click, Arena checks that the season is active, the target is within attack range, the target is not shielded, and the player has Battle Energy.
+  <ul>
+    <li>If validation fails, no Battle Energy is spent and the blocking reason appears inline.</li>
+    <li>A player with <code>0 Gold</code> or an opponent with <code>0 Gold</code> cannot start a Battle.</li>
+  </ul>
+</li>
+<li>Shield: applies to the defender only when the defender loses a Battle.
+  <ul>
+    <li>Duration <code>default: 1 hour; tunable</code>.</li>
+    <li>A defender with active Shield cannot be targeted.</li>
+    <li>Leaderboard entries (including the player's own) show a shield icon and remaining time.</li>
+  </ul>
+</li>
+<li>Shield Boost: a time-limited monetization buff that adds <code>default: +1 hour; tunable</code> to the next Shield the buyer receives.
+  <ul>
+    <li>Expires unused if the buyer is not shielded while active.</li>
+  </ul>
+</li>
+<li>Refresh: the Leaderboard auto-refreshes on a regular interval while the Arena screen is open and immediately when the player closes a battle result.
+  <ul>
+    <li>The player can also refresh manually.</li>
+  </ul>
+</li>
+</ul>
+<h3>Player stats</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/player-stats.png"></p>
+<p>A side panel that displays the player's Arena identity, combat record, and passive income details.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>See Gold total, a proportional bar of Gold lost vs Gold looted, Prime Level, Power, League, Rank, and Gold Income rate.</li>
+<li>Hover League to see the percentile range and rank range for the current League.</li>
+<li>Hover Income to see the time remaining until the next Gold Income credit.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Lost/looted bar: a proportional bar showing cumulative Gold lost on the left and cumulative Gold looted on the right, with numeric labels.</li>
+<li>League tooltip: hovering the League label shows the player's percentile range and rank range for the current League.</li>
+<li>Income tooltip: hovering the Income value shows the time remaining until the next Gold Income credit.</li>
+</ul>
+<h3>Battle energy</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/battle-energy.png"></p>
+<p>An Arena-only energy resource that limits how often the player can start Battles.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>Open Arena and see your current Battle Energy as <code>current/cap</code>.</li>
+<li>Wait for Battle Energy to regenerate.</li>
+<li>Start a Battle and spend 1 Battle Energy.</li>
+<li>Refill Battle Energy through monetization when you run out.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Battle Energy is used only in Arena.</li>
+<li>Battle Energy cap is <code>default: 6; tunable</code>.</li>
+<li>Battle Energy regenerates by <code>default: +1 every 1 hour; tunable</code> until it reaches the cap.</li>
+<li>If Battle Energy is <code>0</code>, the player cannot start a Battle and the UI shows the reason.</li>
+<li>Blocked Battles must not consume Battle Energy.</li>
+<li>Battle Energy Refill restores Battle Energy up to the cap.</li>
+<li>Battle Energy Refill must not increase Battle Energy above the cap.</li>
+</ul>
+<h2>Battle</h2>
+<p>A combat encounter where the attacker selects a wager and confirms an attack, the outcome is resolved from Power-based win chance, and Gold is transferred from the loser to the winner through a pre-configured battle sequence.</p>
+<h3>Attack setup</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/attack-setup.png"></p>
+<p>A configuration screen for selecting wager, battle cry, and Attack Boost before confirming a Battle.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>See the opponent summary: name, rank, Gold, Power, and win chance.</li>
+<li>Select a wager tier and see the stake and potential win amounts.</li>
+<li>Optionally write a battle cry.</li>
+<li>Optionally activate Attack Boost.</li>
+<li>Click Confirm Attack.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>
+<p>Wager tier: the player selects one tier from <code>default: Small / Medium / DeGen; tunable</code>. Defaults to the last-used tier, or Small on first battle.</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Stake %</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Small</td><td>1% of attacker Gold</td></tr>
+<tr><td>Medium</td><td>5% of attacker Gold</td></tr>
+<tr><td>Large</td><td>10% of attacker Gold</td></tr>
+<tr><td>- Stake amount: <code>floor(attackerGold × tier%)</code>. Potential win amount: <code>floor(defenderGold × tier%)</code>.</td><td></td></tr>
+<tr><td>- On win, the attacker gains the potential win amount and the defender loses it. On loss, the attacker loses the stake and the defender gains it.</td><td></td></tr>
+<tr><td>- Attack message: shown in the opponent’s action log with the Battle outcome. Max length <code>default: 80 characters; tunable</code>. Defaults to empty.</td><td></td></tr>
+<tr><td>- Attack Boost: off by default each battle. Increases attacker Power by <code>default: +10%; tunable</code>. Consumed on Confirm Attack whether the player wins or loses.</td><td></td></tr>
+<tr><td>- On Confirm Attack, Arena re-validates eligibility and that the wager produces non-zero amounts. If re-validation fails, no Battle Energy is spent. If it passes, 1 Battle Energy is spent and the Battle Sequence starts.</td><td></td></tr>
+</tbody>
+</table>
+</li>
+</ul>
+<h3>Battle sequence</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/battle-sequence.png"></p>
+<p>A presentation sequence that reveals a confirmed Battle outcome as a staged back-and-forth duel.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li><a href="https://docs.google.com/spreadsheets/d/1nOkiwM1ql8Upoej53OOZpRjLwRdetK8iWv_ZNXghTw4/edit?pli=1&amp;gid=262175658#gid=262175658" target="_blank" rel="noopener noreferrer">A pre-configured battle script matching the confirmed outcome is selected.</a></li>
+<li>Both battlers appear with names, Prime Levels, HP bars, and sprites representing participants.</li>
+<li>The attacker sprite swings toward the defender.</li>
+<li>On hit: the screen shakes, the defender flashes white, a floating damage number spawns behind the defender sprite, floats upward, and fades away. The defender's HP bar drains after the hit visual.</li>
+<li>On miss: a floating "MISS" spawns behind the defender sprite, floats upward, and fades away. The defender tweens away.</li>
+<li>Battlers alternate turns across several exchanges, repeating steps 3–5.</li>
+<li>The killing blow lands with maximum screen shake. The loser's HP reaches 0 and the loser falls. The sequence transitions to Outcome.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li><a href="https://docs.google.com/spreadsheets/d/1nOkiwM1ql8Upoej53OOZpRjLwRdetK8iWv_ZNXghTw4/edit?pli=1&amp;gid=262175658#gid=262175658" target="_blank" rel="noopener noreferrer">Pre-configured battle scripts</a>: outcome is determined at confirmation. The sequence replays a pre-authored script that matches the outcome.</li>
+<li>Presentation only: the player makes no inputs during the sequence.</li>
+<li>Sprites: each battler is represented by a static sprite. All visual feedback comes from programmatic effects (tweens, shaking, flashing, hit pauses).</li>
+<li>HP bars: one per battler, always visible, starting at 100%.
+  <ul>
+    <li>HP drain is delayed after the hit visual, not instant.</li>
+    <li>Color thresholds: green above 50%, yellow between 20% and 50%, red below 20%.</li>
+  </ul>
+</li>
+<li>Screen shake: intensity scales with hit severity across three levels.</li>
+<li>Hitstop: heavy impacts freeze the frame before continuing.</li>
+<li>Flash: white overlay on major impacts.</li>
+</ul>
+<h3>Outcome</h3>
+<p><img alt="image.png" src="../assets/images/case-studies/lands/arena-doc/outcome.png"></p>
+<p>A result screen that shows the Gold change from the resolved Battle.</p>
+<p><strong>Flow</strong></p>
+<ol>
+<li>See Gold transferred between battlers.</li>
+<li>See "Victory" or "Defeat" title with opponent name and Gold delta ("Looted" or "Lost" amount).</li>
+<li>Click Close to return to the Leaderboard.</li>
+</ol>
+<p><strong>Rules</strong></p>
+<ul>
+<li>Gold changes are applied when the outcome is computed, not when the sequence ends.</li>
+<li>Gold transfer: after the killing blow, a band shows the Gold delta for both battlers before the outcome card appears.</li>
+<li>The Battle window remains open after the sequence ends until the player closes it.</li>
+</ul>
+            </article>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <footer class="page-footer">
+          <a class="footer-back" href="../case-studies/77-bit-lands.html">Back to 77-bit Lands</a>
+          <div class="footer-top">
+            <a href="#top" aria-label="Back to top">↑</a>
+          </div>
+        </footer>
+      </div>
+    </main>
+  </body>
+</html>

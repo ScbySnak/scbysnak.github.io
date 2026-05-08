@@ -1,0 +1,15 @@
+.DS_Store
+Thumbs.db
+node_modules/
+dist/
+build/
+.env
+.env.*
+.vscode/
+.idea/
+*.log
+.cache/
+.pytest_cache/
+.playwright/
+*.tmp
+*.bak

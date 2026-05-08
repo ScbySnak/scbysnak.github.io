@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en" id="top">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="77-bit MMORPG case study by Sasha Gulak: combat data, skill trees, enemy behavior, encounter setup, and shipped content.">
+    <title>77-bit MMORPG | Sasha Gulak</title>
+    <link rel="stylesheet" href="../assets/css/styles.css?v=mmo-case-study-8">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav wrap" aria-label="Contact links">
+        <a class="brand" href="../index.html" aria-label="Sasha Gulak portfolio home">
+          <span>Sasha Gulak</span>
+          <span class="brand-separator">·</span>
+          <span class="brand-role">Game Designer</span>
+        </a>
+        <div class="top-links">
+          <a class="contact-link contact-email" href="mailto:frozerbox@gmail.com">frozerbox@gmail.com</a>
+          <a class="contact-link contact-telegram" href="https://t.me/scbysnak">@scbysnak</a>
+          <a class="contact-link contact-cv" href="../assets/docs/Sasha_Gulak_Game_Designer_CV.pdf">Resume</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="wrap-page">
+        <a class="back-link" href="../index.html">← Portfolio</a>
+
+        <section class="doc-section-hero">
+          <h1>77-bit MMORPG</h1>
+          <p class="doc-definition">Browser action MMO · Systems & content design · 77-bit · 2024-2026</p>
+
+          <div class="doc-content doc-content-hero hero-media">
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/sW4VerN7hKQ"
+              title="77-bit MMORPG gameplay trailer"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <p class="doc-content-subtitle">Official 77-bit MMORPG trailer.</p>
+
+          <div class="doc-body hero-summary">
+            <p>77-bit MMORPG was a browser action MMO tied to the studio's airdrop campaign. I worked on combat systems, class progression, enemy behavior, encounter setup, PvP flow, and the client data behind those features.</p>
+            <ul>
+              <li>Set up combat encounters, spawners, rewards, gates, and area content.</li>
+              <li>Built class skill trees with unlock paths, active skills, passive skills, and system links.</li>
+              <li>Designed enemy behavior trees for targeting, ability use, HP gates, distance checks, and combat timing.</li>
+              <li>Configured skills and weapons: charge rules, collider data, damage formulas, animations, and live values.</li>
+            </ul>
+
+            <div class="metrics-row" aria-label="77-bit MMORPG company figures">
+              <div>
+                <span class="metric-value">1M+</span>
+                <span class="metric-label">Registered Accounts</span>
+              </div>
+              <div>
+                <span class="metric-value">180K</span>
+                <span class="metric-label">Peak DAU</span>
+              </div>
+              <div>
+                <span class="metric-value">71%</span>
+                <span class="metric-label">D7 Retention</span>
+              </div>
+              <div>
+                <span class="metric-value">2.5h</span>
+                <span class="metric-label">Average Daily Playtime</span>
+              </div>
+            </div>
+            <p class="doc-content-subtitle metrics-source-note">Company figures from the live game during the active campaign.</p>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="doc-section">
+          <h2>World & Encounter Setup</h2>
+          <p class="doc-definition">Each zone needed encounter placement, spawner setup, rewards, progression gates, and pacing that fit its level range.</p>
+
+          <div class="doc-section-inner">
+            <div class="doc-text">
+              <p>I built playable areas in the game tools and tied map layout to combat content. That included enemy spawns, blockers, reward placement, and how dense each combat space should feel.</p>
+              <ul>
+                <li>Placed and configured spawners for interior, dungeon, and outdoor areas.</li>
+                <li>Tied encounter density to gates, rewards, and route pacing.</li>
+                <li>Adjusted area setup after playtests when the difficulty curve felt wrong.</li>
+              </ul>
+            </div>
+
+            <div class="doc-media-wrap">
+              <button class="doc-content doc-artifact-button" type="button" data-lightbox-src="../assets/images/case-studies/mmo/encounter-setup.png" data-lightbox-alt="Articy screenshot showing 77-bit MMORPG outdoor encounter and spawner setup.">
+                <img src="../assets/images/case-studies/mmo/encounter-setup.png" alt="Articy screenshot showing 77-bit MMORPG outdoor encounter and spawner setup.">
+              </button>
+              <p class="doc-content-subtitle">Outdoor combat zone setup in Articy, with spawners, encounter objects, and gate placement.</p>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="doc-section">
+          <h2>Class Progression & Skill Trees</h2>
+          <p class="doc-definition">Class progression connected active skills, passive skills, unlock paths, and the systems that used those choices.</p>
+
+          <div class="doc-section-inner">
+            <div class="doc-text">
+              <p>I designed class skill trees as data blueprints, not just UI diagrams. Each tree defined unlock path, prerequisites, active skills, passive effects, and the skill references used across the game.</p>
+              <ul>
+                <li>Designed skill-tree structure, branches, unlock logic, and progression pacing.</li>
+                <li>Set up active and passive skill nodes and connected them to gameplay data.</li>
+                <li>Linked class progression to skill configs, descriptions, ability references, and unlock requirements.</li>
+              </ul>
+            </div>
+
+            <div class="doc-media-wrap">
+              <button class="doc-content doc-artifact-button" type="button" data-lightbox-src="../assets/images/case-studies/mmo/skill-tree-setup.png" data-lightbox-alt="Articy screenshot showing a 77-bit MMORPG class skill-tree blueprint and skill configuration panel.">
+                <img src="../assets/images/case-studies/mmo/skill-tree-setup.png" alt="Articy screenshot showing a 77-bit MMORPG class skill-tree blueprint and skill configuration panel.">
+              </button>
+              <p class="doc-content-subtitle">Class skill-tree blueprint with node progression and skill configuration fields.</p>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="doc-section">
+          <h2>Enemy Behavior & Creature Logic</h2>
+          <p class="doc-definition">Enemy behavior trees controlled target choice, ability use, health thresholds, distance checks, and attack timing.</p>
+
+          <div class="doc-section-inner">
+            <div class="doc-text">
+              <p>I built behavior trees for enemies and creatures so archetypes did not all fight the same way. The trees handled patrol states, target selection, ability choice, range checks, and combat state changes.</p>
+              <ul>
+                <li>Built behavior-tree flows for enemy families, bosses, and creature archetypes.</li>
+                <li>Defined target selection, HP-range checks, distance gates, and ability-use conditions.</li>
+                <li>Tuned ability timing and wait windows so attacks had clear spacing.</li>
+              </ul>
+            </div>
+
+            <div class="doc-media-wrap">
+              <button class="doc-content doc-artifact-button" type="button" data-lightbox-src="../assets/images/case-studies/mmo/enemy-behavior-tree.png" data-lightbox-alt="Articy screenshot showing a 77-bit MMORPG enemy behavior tree with target selection, HP gates, and ability nodes.">
+                <img src="../assets/images/case-studies/mmo/enemy-behavior-tree.png" alt="Articy screenshot showing a 77-bit MMORPG enemy behavior tree with target selection, HP gates, and ability nodes.">
+              </button>
+              <p class="doc-content-subtitle">Enemy behavior tree with target selection, HP gates, distance checks, and ability-use nodes.</p>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="doc-section">
+          <h2>Skill & Weapon Configuration</h2>
+          <p class="doc-definition">Skills and weapons shipped as data: charge timing, collider shape, damage formulas, animation links, and resource behavior.</p>
+
+          <div class="doc-section-inner">
+            <div class="doc-text">
+              <p>I configured skills and weapons in the game data layer. The setup covered charge time, scaling, hit shape, animation references, resource cost, and the stats driving final damage.</p>
+              <ul>
+                <li>Set charge parameters, collider types, hit radius, angle, cooldowns, and resource behavior.</li>
+                <li>Connected skill data to animation/VFX references and weapon ability descriptions.</li>
+                <li>Kept combat rules in tunable data so the game could run, test, and adjust them quickly.</li>
+              </ul>
+            </div>
+
+            <div class="doc-media-wrap">
+              <button class="doc-content doc-artifact-button" type="button" data-lightbox-src="../assets/images/case-studies/mmo/skill-config-power-smash.png" data-lightbox-alt="Endy editor and code screenshot showing the 77-bit MMORPG Power Smash skill configuration.">
+                <img src="../assets/images/case-studies/mmo/skill-config-power-smash.png" alt="Endy editor and code screenshot showing the 77-bit MMORPG Power Smash skill configuration.">
+              </button>
+              <p class="doc-content-subtitle">Power Smash config with charge timing, arc collider data, damage inputs, animation reference, and runtime fields.</p>
+            </div>
+          </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <footer class="page-footer">
+          <a class="footer-back" href="../index.html">Back to portfolio</a>
+          <div class="footer-top">
+            <a href="#top" aria-label="Back to top">↑</a>
+          </div>
+        </footer>
+      </div>
+    </main>
+
+    <dialog class="artifact-lightbox" id="artifact-lightbox" aria-label="Full-size artifact viewer">
+      <button class="artifact-lightbox-close" type="button" aria-label="Close full-size artifact">&times;</button>
+      <img class="artifact-lightbox-image" alt="">
+    </dialog>
+
+    <script>
+      const lightbox = document.getElementById("artifact-lightbox");
+      const lightboxImage = lightbox.querySelector(".artifact-lightbox-image");
+      const lightboxClose = lightbox.querySelector(".artifact-lightbox-close");
+      const artifactButtons = document.querySelectorAll("[data-lightbox-src]");
+
+      function closeLightbox() {
+        lightboxImage.src = "";
+        lightboxImage.alt = "";
+        if (lightbox.open) {
+          lightbox.close();
+        }
+      }
+
+      artifactButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          lightboxImage.src = button.dataset.lightboxSrc;
+          lightboxImage.alt = button.dataset.lightboxAlt || "";
+          lightbox.showModal();
+          lightboxClose.focus();
+        });
+      });
+
+      lightbox.addEventListener("click", event => {
+        if (event.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      lightboxClose.addEventListener("click", closeLightbox);
+
+      lightbox.addEventListener("close", () => {
+        lightboxImage.src = "";
+        lightboxImage.alt = "";
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && lightbox.open) {
+          closeLightbox();
+        }
+      });
+    </script>
+  </body>
+</html>
