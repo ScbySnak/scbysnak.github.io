@@ -8,7 +8,7 @@
     <meta property="og:description" content="Selected work by Sasha Gulak: browser MMO, idle PvP, mobile prototypes, puzzle, roguelike, shooter, and game jams.">
     <meta property="og:type" content="website">
     <title>Sasha Gulak | Game Designer</title>
-    <link rel="stylesheet" href="assets/css/styles.css?v=portfolio-53">
+    <link rel="stylesheet" href="assets/css/styles.css?v=mobile-stacked-1">
   </head>
   <body>
     <header class="site-header">
@@ -227,34 +227,107 @@
       </div>
     </main>
     <script>
-      document.querySelectorAll(".tile-preview-video").forEach((video) => {
-        const tile = video.closest(".work-tile");
+      const mobilePreviewQuery = window.matchMedia("(max-width: 620px)");
+      const previewTiles = Array.from(document.querySelectorAll(".tile-preview-video"))
+        .map((video) => ({
+          video,
+          tile: video.closest(".work-tile"),
+        }))
+        .filter(({ tile }) => tile);
 
-        if (!tile) {
+      let mobilePreviewObserver = null;
+
+      const playPreview = ({ video, tile }) => {
+        tile.classList.add("is-preview-playing");
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        if (video.readyState === 0) {
+          video.load();
+        }
+        video.play().catch(() => {});
+      };
+
+      const pausePreview = ({ video, tile }, reset = false) => {
+        tile.classList.remove("is-preview-playing");
+        video.pause();
+        if (reset) {
+          video.currentTime = 0;
+        }
+      };
+
+      previewTiles.forEach((preview) => {
+        const playOnDesktop = () => {
+          if (!mobilePreviewQuery.matches) {
+            playPreview(preview);
+          }
+        };
+
+        const pauseOnDesktop = () => {
+          if (!mobilePreviewQuery.matches) {
+            pausePreview(preview, true);
+          }
+        };
+
+        preview.tile.addEventListener("pointerenter", playOnDesktop);
+        preview.tile.addEventListener("pointerleave", pauseOnDesktop);
+        preview.tile.addEventListener("mouseenter", playOnDesktop);
+        preview.tile.addEventListener("mouseleave", pauseOnDesktop);
+        preview.tile.addEventListener("focusin", playOnDesktop);
+        preview.tile.addEventListener("focusout", pauseOnDesktop);
+      });
+
+      const stopMobileAutoplay = () => {
+        if (mobilePreviewObserver) {
+          mobilePreviewObserver.disconnect();
+          mobilePreviewObserver = null;
+        }
+        previewTiles.forEach((preview) => pausePreview(preview, true));
+      };
+
+      const startMobileAutoplay = () => {
+        stopMobileAutoplay();
+
+        if (!("IntersectionObserver" in window)) {
+          previewTiles.forEach(playPreview);
           return;
         }
 
-        const playVideo = () => {
-          tile.classList.add("is-preview-playing");
-          if (video.readyState === 0) {
-            video.load();
-          }
-          video.play().catch(() => {});
-        };
+        mobilePreviewObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            const preview = previewTiles.find(({ tile }) => tile === entry.target);
 
-        const pauseVideo = () => {
-          tile.classList.remove("is-preview-playing");
-          video.pause();
-          video.currentTime = 0;
-        };
+            if (!preview) {
+              return;
+            }
 
-        tile.addEventListener("pointerenter", playVideo);
-        tile.addEventListener("pointerleave", pauseVideo);
-        tile.addEventListener("mouseenter", playVideo);
-        tile.addEventListener("mouseleave", pauseVideo);
-        tile.addEventListener("focusin", playVideo);
-        tile.addEventListener("focusout", pauseVideo);
-      });
+            if (entry.isIntersecting) {
+              playPreview(preview);
+            } else {
+              pausePreview(preview);
+            }
+          });
+        }, {
+          threshold: 0.35,
+        });
+
+        previewTiles.forEach(({ tile }) => mobilePreviewObserver.observe(tile));
+      };
+
+      const syncPreviewMode = () => {
+        if (mobilePreviewQuery.matches) {
+          startMobileAutoplay();
+        } else {
+          stopMobileAutoplay();
+        }
+      };
+
+      syncPreviewMode();
+      if (mobilePreviewQuery.addEventListener) {
+        mobilePreviewQuery.addEventListener("change", syncPreviewMode);
+      } else {
+        mobilePreviewQuery.addListener(syncPreviewMode);
+      }
     </script>
   </body>
 </html>
